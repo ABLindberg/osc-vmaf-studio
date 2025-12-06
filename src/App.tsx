@@ -6,6 +6,7 @@ import ResultsViewer from './components/ResultsViewer';
 import VmafScoreCircle from './components/VmafScoreCircle';
 import Settings from './components/Settings';
 import Help from './components/Help';
+import { apiRequest } from './utils/api';
 
 interface UploadedFile {
   type: 'file';
@@ -97,7 +98,7 @@ function App() {
   // Check if backend is configured
   const checkConfiguration = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/config');
+      const response = await apiRequest('/config');
       const config = await response.json();
 
       // Store storage type for UI logic
@@ -122,7 +123,7 @@ function App() {
 
   const loadBuckets = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/buckets');
+      const response = await apiRequest('/buckets');
 
       if (response.ok) {
         const data = await response.json();
@@ -165,8 +166,8 @@ function App() {
     setIsLoadingFiles(true);
     try {
       const url = currentFolder
-        ? `http://localhost:3001/api/files?folder=${encodeURIComponent(currentFolder)}&bucket=${encodeURIComponent(currentBucket)}`
-        : `http://localhost:3001/api/files?bucket=${encodeURIComponent(currentBucket)}`;
+        ? `/api/files?folder=${encodeURIComponent(currentFolder)}&bucket=${encodeURIComponent(currentBucket)}`
+        : `/api/files?bucket=${encodeURIComponent(currentBucket)}`;
 
       const response = await fetch(url);
 
@@ -217,7 +218,7 @@ function App() {
     if (!bucketName) return;
 
     try {
-      const response = await fetch('http://localhost:3001/api/buckets', {
+      const response = await apiRequest('/buckets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -251,7 +252,7 @@ function App() {
       }
 
       // First check job status
-      const statusResponse = await fetch(`http://localhost:3001/api/jobs/${jobId}/status`);
+      const statusResponse = await fetch(`/api/jobs/${jobId}/status`);
       const statusResult = await statusResponse.json();
 
       // Update job status in the list
@@ -268,7 +269,7 @@ function App() {
 
       // If job is completed, fetch the results
       if (statusResult.status === 'completed') {
-        const resultsResponse = await fetch(`http://localhost:3001/api/results/${jobId}?bucket=${encodeURIComponent(job.bucket)}`);
+        const resultsResponse = await fetch(`/api/results/${jobId}?bucket=${encodeURIComponent(job.bucket)}`);
         const result = await resultsResponse.json();
 
         if (result.vmafScore !== undefined) {
@@ -307,7 +308,7 @@ function App() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/jobs?bucket=${encodeURIComponent(currentBucket)}`);
+      const response = await fetch(`/api/jobs?bucket=${encodeURIComponent(currentBucket)}`);
 
       if (response.ok) {
         const jobMetadata = await response.json();
@@ -371,7 +372,7 @@ function App() {
     if (!folderName) return;
 
     try {
-      const response = await fetch('http://localhost:3001/api/folders', {
+      const response = await apiRequest('/folders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -396,7 +397,7 @@ function App() {
 
   const handleDeleteFile = async (key: string) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/files/${encodeURIComponent(key)}`, {
+      const response = await fetch(`/api/files/${encodeURIComponent(key)}`, {
         method: 'DELETE',
       });
 
@@ -415,7 +416,7 @@ function App() {
 
   const handleDeleteFolder = async (key: string) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/folders/${encodeURIComponent(key)}`, {
+      const response = await fetch(`/api/folders/${encodeURIComponent(key)}`, {
         method: 'DELETE',
       });
 
@@ -491,7 +492,7 @@ function App() {
       // Fetch results if job is completed but results not loaded
       if (job.status === 'completed' && !job.result) {
         try {
-          const resultsResponse = await fetch(`http://localhost:3001/api/results/${jobId}?bucket=${encodeURIComponent(job.bucket)}`);
+          const resultsResponse = await fetch(`/api/results/${jobId}?bucket=${encodeURIComponent(job.bucket)}`);
           const result = await resultsResponse.json();
 
           if (result.vmafScore !== undefined) {
@@ -511,7 +512,7 @@ function App() {
 
     try {
       // Fetch the raw result file from the backend
-      const response = await fetch(`http://localhost:3001/api/results/${job.jobId}/raw?bucket=${encodeURIComponent(job.bucket)}`);
+      const response = await fetch(`/api/results/${job.jobId}/raw?bucket=${encodeURIComponent(job.bucket)}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch raw results');
@@ -547,7 +548,7 @@ function App() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/jobs/${job.jobId}?bucket=${encodeURIComponent(job.bucket)}`, {
+      const response = await fetch(`/api/jobs/${job.jobId}?bucket=${encodeURIComponent(job.bucket)}`, {
         method: 'DELETE',
       });
 

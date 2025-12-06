@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { apiRequest } from '../utils/api';
 
 interface FileUploadProps {
   onFileUploaded: (file: { key: string; name: string; size: number }) => void;
@@ -30,7 +31,7 @@ function FileUpload({ onFileUploaded, folder, bucket, storageType = 's3-compatib
 
       try {
         // Get presigned URL
-        const response = await fetch('http://localhost:3001/api/upload-url', {
+        const response = await apiRequest('/upload-url', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

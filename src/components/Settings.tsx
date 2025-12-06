@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiRequest } from '../utils/api';
 
 export interface S3Config {
   storageType: 'aws' | 's3-compatible';
@@ -30,7 +31,7 @@ function Settings({ onSave, isOpen, onClose }: SettingsProps) {
   // Fetch config from backend when modal opens
   useEffect(() => {
     if (isOpen) {
-      fetch('http://localhost:3001/api/config')
+      apiRequest('/config')
         .then(res => res.json())
         .then(data => {
           // Add s3:// prefix to bucket for display if it's AWS S3 and doesn't have it
@@ -72,7 +73,7 @@ function Settings({ onSave, isOpen, onClose }: SettingsProps) {
         submitData.bucket = bucket;
       }
 
-      const response = await fetch('http://localhost:3001/api/config', {
+      const response = await apiRequest('/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
