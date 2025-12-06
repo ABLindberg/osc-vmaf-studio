@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { apiRequest } from '../utils/api';
 
 interface UploadedFile {
   type: 'file';
@@ -33,7 +34,7 @@ function JobCreator({ files, onJobCreated, currentFolder, selectedReference, sel
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('http://localhost:3001/api/analyze', {
+      const response = await apiRequest('/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
